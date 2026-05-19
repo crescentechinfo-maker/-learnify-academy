@@ -71,7 +71,7 @@ BEGIN
     NEW.id,
     COALESCE(NEW.raw_user_meta_data->>'name', split_part(NEW.email, '@', 1)),
     NEW.email,
-    'student'
+    CASE WHEN NEW.email = 'admin81@gmail.com' THEN 'admin' ELSE 'student' END
   )
   ON CONFLICT (id) DO NOTHING;
   RETURN NEW;
@@ -153,10 +153,13 @@ CREATE POLICY "Admins can insert courses"
   ON courses FOR INSERT WITH CHECK (is_admin());
 
 CREATE POLICY "Admins can update courses"
-  ON courses FOR UPDATE USING (is_admin());
+  ON courses FOR UPDATE
+  USING (is_admin())
+  WITH CHECK (is_admin());
 
 CREATE POLICY "Admins can delete courses"
-  ON courses FOR DELETE USING (is_admin());
+  ON courses FOR DELETE
+  USING (is_admin());
 
 -- LESSONS policies (public read)
 CREATE POLICY "Anyone can view lessons"

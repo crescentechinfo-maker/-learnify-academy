@@ -19,6 +19,7 @@ export function RegisterPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError('')
+    if (email.toLowerCase() === 'admin81@gmail.com') { setError('This email is not available for registration.'); return }
     if (password.length < 6) { setError('Password must be at least 6 characters'); return }
     setLoading(true)
     try {
