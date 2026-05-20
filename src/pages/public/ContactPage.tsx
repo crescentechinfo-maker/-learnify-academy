@@ -31,9 +31,9 @@ export function ContactPage() {
       <div className="grid lg:grid-cols-3 gap-10">
         <div className="space-y-6">
           {[
-            { icon: Mail, title: 'Email Us', value: 'support@learnify.ai', sub: 'We reply within 24 hours' },
-            { icon: Phone, title: 'Call Us', value: '+1 (800) 123-4567', sub: 'Mon-Fri 9am-6pm EST' },
-            { icon: MapPin, title: 'Visit Us', value: 'San Francisco, CA', sub: 'United States' },
+            { icon: Mail, title: 'Email Us', value: 'crescentechinfo@gmail.com', sub: 'We reply within 24 hours' },
+            { icon: Phone, title: 'Call Us', value: '+6016 423 6116', sub: 'Mon-Fri 9am-6pm MYT' },
+            { icon: MapPin, title: 'Visit Us', value: 'Kepala Batas', sub: 'Malaysia' },
           ].map((item) => (
             <div key={item.title} className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/8 flex items-start gap-4">
               <div className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-600/20 flex-shrink-0">
