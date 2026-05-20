@@ -10,7 +10,7 @@ interface AuthContextType {
   session: Session | null
   loading: boolean
   login: (email: string, password: string) => Promise<Profile | null>
-  register: (email: string, password: string, name: string) => Promise<void>
+  register: (email: string, password: string, name: string) => Promise<any>
   logout: () => Promise<void>
   refreshProfile: () => Promise<void>
   isAdmin: boolean
@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function register(email: string, password: string, name: string) {
-    await signUp(email, password, name)
+    return await signUp(email, password, name)
   }
 
   async function logout() {

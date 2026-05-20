@@ -19,13 +19,21 @@ export function RegisterPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError('')
-    if (email.toLowerCase() === 'admin81@gmail.com') { setError('This email is not available for registration.'); return }
     if (password.length < 6) { setError('Password must be at least 6 characters'); return }
     setLoading(true)
     try {
-      await register(email, password, name)
-      setSuccess(true)
-      setTimeout(() => navigate('/login'), 3000)
+      const data = await register(email, password, name)
+      if (data?.session?.user) {
+        const profile = await import('../../lib/auth').then(m => m.getProfile(data.session!.user.id))
+        if (profile?.role === 'admin') {
+          navigate('/secure-admin')
+        } else {
+          navigate('/student-dashboard')
+        }
+      } else {
+        setSuccess(true)
+        setTimeout(() => navigate('/login'), 3000)
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Registration failed. Please try again.')
     } finally {
