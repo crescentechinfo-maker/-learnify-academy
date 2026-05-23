@@ -115,6 +115,7 @@ DROP POLICY IF EXISTS "Users can update their own profile" ON profiles;
 DROP POLICY IF EXISTS "Users can insert their own profile" ON profiles;
 DROP POLICY IF EXISTS "Admins can view all profiles" ON profiles;
 DROP POLICY IF EXISTS "Admins can update all profiles" ON profiles;
+DROP POLICY IF EXISTS "Admins can delete profiles" ON profiles;
 DROP POLICY IF EXISTS "Anyone can view courses" ON courses;
 DROP POLICY IF EXISTS "Admins can insert courses" ON courses;
 DROP POLICY IF EXISTS "Admins can update courses" ON courses;
@@ -144,6 +145,9 @@ CREATE POLICY "Admins can view all profiles"
 
 CREATE POLICY "Admins can update all profiles"
   ON profiles FOR UPDATE USING (is_admin());
+
+CREATE POLICY "Admins can delete profiles"
+  ON profiles FOR DELETE USING (is_admin());
 
 -- COURSES policies (public read)
 CREATE POLICY "Anyone can view courses"
