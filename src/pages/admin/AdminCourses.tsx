@@ -11,12 +11,20 @@ import type { Course } from '../../types'
 
 const CATEGORIES = [
   { value: 'Web Development', label: 'Web Development' },
+  { value: 'Mobile Development', label: 'Mobile Development' },
   { value: 'Data Science', label: 'Data Science' },
-  { value: 'Design', label: 'Design' },
-  { value: 'Mobile', label: 'Mobile' },
-  { value: 'AI/ML', label: 'AI/ML' },
+  { value: 'AI/ML', label: 'AI / Machine Learning' },
+  { value: 'Design', label: 'UI/UX Design' },
+  { value: 'Cybersecurity', label: 'Cybersecurity' },
+  { value: 'Cloud Computing', label: 'Cloud Computing' },
+  { value: 'DevOps', label: 'DevOps' },
   { value: 'Business', label: 'Business' },
   { value: 'Marketing', label: 'Marketing' },
+  { value: 'Finance', label: 'Finance' },
+  { value: 'Photography', label: 'Photography' },
+  { value: 'Language', label: 'Language' },
+  { value: 'Personal Development', label: 'Personal Development' },
+  { value: 'General', label: 'General' },
 ]
 
 const EMPTY_FORM = { title: '', description: '', thumbnail: '', instructor: '', category: 'Web Development' }
