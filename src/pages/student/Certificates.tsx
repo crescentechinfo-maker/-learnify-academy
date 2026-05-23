@@ -31,6 +31,7 @@ function CertificateView({ cert, profile }: { cert: Certificate; profile: { name
         <div class="name">${profile.name}</div>
         <div style="font-size:16px;color:#666;margin-bottom:12px">has successfully completed</div>
         <div class="course">${cert.course?.title ?? 'Course'}</div>
+        ${cert.ai_message ? `<div style="font-size:14px;color:#555;font-style:italic;max-width:600px;margin:0 auto 24px;line-height:1.6">"${cert.ai_message}"</div>` : ''}
         <div class="meta">
           Issued: ${new Date(cert.issued_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}<br/>
           Certificate ID: ${cert.certificate_code}
@@ -52,7 +53,12 @@ function CertificateView({ cert, profile }: { cert: Certificate; profile: { name
           <p className="text-gray-500 text-sm mb-6">This is to certify that</p>
           <p className="text-3xl font-bold gradient-text mb-2">{profile.name}</p>
           <p className="text-gray-500 text-sm mb-4">has successfully completed</p>
-          <p className="text-xl font-semibold text-gray-900 dark:text-white mb-6">{cert.course?.title ?? 'Course'}</p>
+          <p className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{cert.course?.title ?? 'Course'}</p>
+          {cert.ai_message && (
+            <p className="text-sm text-gray-600 dark:text-gray-300 italic max-w-md mx-auto mb-6 leading-relaxed border-t border-amber-200 dark:border-amber-500/20 pt-4">
+              "{cert.ai_message}"
+            </p>
+          )}
           <div className="flex items-center justify-center gap-8 text-xs text-gray-500">
             <div>
               <p className="font-medium text-gray-700 dark:text-gray-300">Date Issued</p>

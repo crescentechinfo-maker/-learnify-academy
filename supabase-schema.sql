@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS certificates (
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   course_id UUID REFERENCES courses(id) ON DELETE CASCADE,
   certificate_code TEXT NOT NULL UNIQUE,
+  ai_message TEXT,
   issued_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, course_id)
 );

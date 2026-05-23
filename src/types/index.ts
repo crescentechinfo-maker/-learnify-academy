@@ -42,6 +42,7 @@ export interface Certificate {
   user_id: string
   course_id: string
   certificate_code: string
+  ai_message: string | null
   issued_at: string
   course?: Course
   profile?: Profile

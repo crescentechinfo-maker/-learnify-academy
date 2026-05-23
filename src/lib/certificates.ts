@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { generateCertificateMessage } from './ai'
 import type { Certificate } from '../types'
 
 function generateCertCode(): string {
@@ -36,12 +37,21 @@ export async function issueCertificate(userId: string, courseId: string): Promis
   const existing = await getCertificate(userId, courseId)
   if (existing) return existing
 
+  const { data: courseData } = await supabase.from('courses').select('title').eq('id', courseId).single()
+  const { data: profileData } = await supabase.from('profiles').select('name').eq('id', userId).single()
+
+  const ai_message = await generateCertificateMessage(
+    profileData?.name ?? 'Student',
+    courseData?.title ?? 'the course'
+  )
+
   const { data, error } = await supabase
     .from('certificates')
     .insert({
       user_id: userId,
       course_id: courseId,
       certificate_code: generateCertCode(),
+      ai_message: ai_message || null,
       issued_at: new Date().toISOString(),
     })
     .select('*, course:courses(*), profile:profiles(*)')
