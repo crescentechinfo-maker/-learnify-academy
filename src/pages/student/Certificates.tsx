@@ -1,83 +1,182 @@
-import { useEffect, useRef, useState } from 'react'
-import { Award, Printer } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Award, Download, GraduationCap, Sparkles } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { getUserCertificates } from '../../lib/certificates'
 import { Button } from '../../components/ui/Button'
 import type { Certificate } from '../../types'
 
-function CertificateView({ cert, profile }: { cert: Certificate; profile: { name: string } }) {
-  const printRef = useRef<HTMLDivElement>(null)
-
+function CertificateView({ cert, studentName }: { cert: Certificate; studentName: string }) {
   function handlePrint() {
-    const win = window.open('', '', 'width=900,height=650')
+    const win = window.open('', '', 'width=1000,height=720')
     if (!win) return
-    win.document.write(`
-      <html><head><title>Certificate - ${cert.certificate_code}</title>
-      <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Georgia', serif; background: white; }
-        .cert { width: 900px; min-height: 600px; padding: 60px; border: 20px solid #4f46e5; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .logo { font-size: 28px; font-weight: bold; color: #4f46e5; margin-bottom: 30px; }
-        .title { font-size: 48px; color: #1a1a2e; margin-bottom: 16px; }
-        .sub { font-size: 18px; color: #666; margin-bottom: 40px; }
-        .name { font-size: 36px; font-weight: bold; color: #4f46e5; margin-bottom: 16px; border-bottom: 2px solid #f59e0b; padding-bottom: 8px; display: inline-block; }
-        .course { font-size: 24px; color: #1a1a2e; margin-bottom: 40px; }
-        .meta { font-size: 14px; color: #999; }
-      </style></head><body>
+    const issued = new Date(cert.issued_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    win.document.write(`<!DOCTYPE html><html><head><title>Certificate — ${studentName}</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600&display=swap');
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { background: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+      .page { width: 960px; min-height: 680px; padding: 0; position: relative; font-family: 'Inter', sans-serif; }
+      .cert {
+        width: 100%; min-height: 680px; padding: 56px 72px;
+        background: linear-gradient(135deg, #fefce8 0%, #fff 40%, #eef2ff 100%);
+        border: 2px solid #e5c84a;
+        box-shadow: inset 0 0 0 8px #fff, inset 0 0 0 10px #f59e0b33;
+        display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+        text-align: center; position: relative; overflow: hidden;
+      }
+      .corner { position: absolute; width: 80px; height: 80px; }
+      .corner-tl { top: 16px; left: 16px; border-top: 3px solid #f59e0b; border-left: 3px solid #f59e0b; }
+      .corner-tr { top: 16px; right: 16px; border-top: 3px solid #f59e0b; border-right: 3px solid #f59e0b; }
+      .corner-bl { bottom: 16px; left: 16px; border-bottom: 3px solid #f59e0b; border-left: 3px solid #f59e0b; }
+      .corner-br { bottom: 16px; right: 16px; border-bottom: 3px solid #f59e0b; border-right: 3px solid #f59e0b; }
+      .logo-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+      .logo-icon { width: 52px; height: 52px; background: linear-gradient(135deg, #4f46e5, #6366f1); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+      .logo-text { font-size: 26px; font-weight: 700; color: #4f46e5; letter-spacing: -0.5px; }
+      .logo-text span { color: #f59e0b; }
+      .academy { font-size: 12px; color: #64748b; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 24px; }
+      .divider { width: 80px; height: 2px; background: linear-gradient(90deg, transparent, #f59e0b, transparent); margin: 0 auto 20px; }
+      .heading { font-family: 'Playfair Display', serif; font-size: 42px; color: #1e1b4b; font-weight: 700; margin-bottom: 8px; }
+      .sub { font-size: 15px; color: #64748b; margin-bottom: 24px; letter-spacing: 0.5px; }
+      .name { font-family: 'Playfair Display', serif; font-size: 46px; font-weight: 700; color: #4f46e5; margin-bottom: 6px; padding-bottom: 10px; border-bottom: 2px solid #f59e0b; display: inline-block; }
+      .completed { font-size: 14px; color: #64748b; margin: 16px 0 8px; letter-spacing: 0.5px; }
+      .course { font-size: 24px; font-weight: 600; color: #1e1b4b; margin-bottom: 20px; }
+      .ai-msg { font-size: 13px; color: #475569; font-style: italic; max-width: 580px; margin: 0 auto 24px; line-height: 1.7; padding: 14px 20px; background: #fefce8; border-left: 3px solid #f59e0b; border-radius: 0 8px 8px 0; text-align: left; }
+      .footer { display: flex; gap: 60px; align-items: flex-start; }
+      .footer-item { text-align: center; }
+      .footer-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; margin-bottom: 4px; }
+      .footer-value { font-size: 13px; color: #334155; font-weight: 500; }
+      .footer-code { font-family: monospace; font-size: 13px; color: #f59e0b; font-weight: 600; }
+      .seal { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #eab308); display: flex; flex-direction: column; align-items: center; justify-content: center; border: 3px solid #fff; box-shadow: 0 0 0 2px #f59e0b; }
+      .seal-text { font-size: 8px; font-weight: 700; color: #1a1a1a; text-transform: uppercase; letter-spacing: 1px; }
+    </style></head><body>
+    <div class="page">
       <div class="cert">
-        <div class="logo">🎓 Learnify AI Academy</div>
-        <div class="title">Certificate of Completion</div>
-        <div class="sub">This is to certify that</div>
-        <div class="name">${profile.name}</div>
-        <div style="font-size:16px;color:#666;margin-bottom:12px">has successfully completed</div>
-        <div class="course">${cert.course?.title ?? 'Course'}</div>
-        ${cert.ai_message ? `<div style="font-size:14px;color:#555;font-style:italic;max-width:600px;margin:0 auto 24px;line-height:1.6">"${cert.ai_message}"</div>` : ''}
-        <div class="meta">
-          Issued: ${new Date(cert.issued_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}<br/>
-          Certificate ID: ${cert.certificate_code}
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+
+        <div>
+          <div class="logo-wrap" style="justify-content:center">
+            <div class="logo-icon">🎓</div>
+            <div class="logo-text">Learnify <span>AI</span></div>
+          </div>
+          <div class="academy">Learnify AI Academy</div>
+          <div class="divider"></div>
+          <div class="heading">Certificate of Completion</div>
+          <div class="sub">This is to proudly certify that</div>
+          <div class="name">${studentName}</div>
+          <div class="completed">has successfully completed the course</div>
+          <div class="course">${cert.course?.title ?? 'Course'}</div>
+          ${cert.ai_message ? `<div class="ai-msg">"${cert.ai_message}"</div>` : ''}
         </div>
-      </div></body></html>`)
+
+        <div class="footer">
+          <div class="footer-item">
+            <div class="footer-label">Date Issued</div>
+            <div class="footer-value">${issued}</div>
+          </div>
+          <div class="seal">
+            <div class="seal-text">Learnify</div>
+            <div style="font-size:18px">★</div>
+            <div class="seal-text">Certified</div>
+          </div>
+          <div class="footer-item">
+            <div class="footer-label">Certificate ID</div>
+            <div class="footer-code">${cert.certificate_code}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>window.onload=()=>{window.print();}</script>
+    </body></html>`)
     win.document.close()
-    win.print()
   }
 
+  const issued = new Date(cert.issued_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+
   return (
-    <div className="glass rounded-2xl border border-amber-200 dark:border-amber-500/20 overflow-hidden">
-      <div ref={printRef} className="p-8 bg-gradient-to-br from-amber-50 dark:from-gray-900 to-indigo-50 dark:to-indigo-950 border-b border-gray-200 dark:border-white/10">
-        <div className="max-w-2xl mx-auto text-center border-2 border-amber-300 dark:border-amber-500/30 rounded-2xl p-8">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-yellow-400 flex items-center justify-center mx-auto mb-4">
-            <Award size={28} className="text-gray-900" />
-          </div>
-          <p className="text-amber-600 dark:text-amber-400 text-sm font-medium uppercase tracking-widest mb-2">Learnify AI Academy</p>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Certificate of Completion</h2>
-          <p className="text-gray-500 text-sm mb-6">This is to certify that</p>
-          <p className="text-3xl font-bold gradient-text mb-2">{profile.name}</p>
-          <p className="text-gray-500 text-sm mb-4">has successfully completed</p>
-          <p className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{cert.course?.title ?? 'Course'}</p>
-          {cert.ai_message && (
-            <p className="text-sm text-gray-600 dark:text-gray-300 italic max-w-md mx-auto mb-6 leading-relaxed border-t border-amber-200 dark:border-amber-500/20 pt-4">
-              "{cert.ai_message}"
-            </p>
-          )}
-          <div className="flex items-center justify-center gap-8 text-xs text-gray-500">
-            <div>
-              <p className="font-medium text-gray-700 dark:text-gray-300">Date Issued</p>
-              <p>{new Date(cert.issued_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+    <div className="rounded-2xl overflow-hidden shadow-xl border border-amber-200 dark:border-amber-500/20">
+      {/* Certificate Card */}
+      <div className="relative bg-gradient-to-br from-amber-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-900 dark:to-indigo-950 p-10">
+        {/* Corner Decorations */}
+        <div className="absolute top-4 left-4 w-12 h-12 border-t-2 border-l-2 border-amber-400 rounded-tl-lg" />
+        <div className="absolute top-4 right-4 w-12 h-12 border-t-2 border-r-2 border-amber-400 rounded-tr-lg" />
+        <div className="absolute bottom-4 left-4 w-12 h-12 border-b-2 border-l-2 border-amber-400 rounded-bl-lg" />
+        <div className="absolute bottom-4 right-4 w-12 h-12 border-b-2 border-r-2 border-amber-400 rounded-br-lg" />
+
+        <div className="max-w-2xl mx-auto text-center">
+          {/* Logo */}
+          <div className="flex items-center justify-center gap-3 mb-1">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+              <GraduationCap size={24} className="text-white" />
             </div>
-            <div className="h-8 w-px bg-gray-200 dark:bg-white/20" />
-            <div>
-              <p className="font-medium text-gray-700 dark:text-gray-300">Certificate ID</p>
-              <p className="font-mono text-amber-600 dark:text-amber-400">{cert.certificate_code}</p>
+            <div className="text-left">
+              <div className="text-xl font-bold text-gray-900 dark:text-white leading-none">
+                Learnify <span className="text-amber-500">AI</span>
+              </div>
+              <div className="text-xs text-gray-400 tracking-widest uppercase">Academy</div>
+            </div>
+          </div>
+
+          <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent mx-auto my-4" />
+
+          {/* Title */}
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <Award size={26} className="text-white" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1 tracking-tight">Certificate of Completion</h2>
+          <p className="text-gray-400 text-sm mb-6 tracking-wider uppercase text-xs">This is to proudly certify that</p>
+
+          {/* Student Name */}
+          <p className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+            {studentName}
+          </p>
+          <div className="w-48 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent mx-auto mt-2 mb-5" />
+
+          <p className="text-gray-500 text-sm mb-2 uppercase tracking-widest text-xs">has successfully completed</p>
+
+          {/* Course Name */}
+          <p className="text-xl font-semibold text-gray-900 dark:text-white mb-5 px-4">{cert.course?.title ?? 'Course'}</p>
+
+          {/* AI Message */}
+          {cert.ai_message && (
+            <div className="bg-amber-50 dark:bg-amber-500/10 border-l-4 border-amber-400 rounded-r-xl px-5 py-4 mb-6 text-left">
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles size={13} className="text-amber-500" />
+                <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">AI Achievement Message</span>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-300 italic leading-relaxed">"{cert.ai_message}"</p>
+            </div>
+          )}
+
+          {/* Footer */}
+          <div className="flex items-center justify-center gap-10 pt-4 border-t border-amber-200 dark:border-amber-500/20">
+            <div className="text-center">
+              <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">Date Issued</p>
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{issued}</p>
+            </div>
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex flex-col items-center justify-center shadow-md flex-shrink-0">
+              <span className="text-white text-xs font-bold leading-none">★</span>
+              <span className="text-white text-xs font-bold leading-none mt-0.5">CERT</span>
+            </div>
+            <div className="text-center">
+              <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">Certificate ID</p>
+              <p className="text-sm font-mono font-semibold text-amber-600 dark:text-amber-400">{cert.certificate_code}</p>
             </div>
           </div>
         </div>
       </div>
-      <div className="p-4 flex items-center justify-between">
+
+      {/* Bottom Bar */}
+      <div className="px-6 py-4 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-white/5 flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-900 dark:text-white">{cert.course?.title}</p>
+          <p className="text-sm font-semibold text-gray-900 dark:text-white">{cert.course?.title}</p>
           <p className="text-xs text-gray-400 font-mono mt-0.5">{cert.certificate_code}</p>
         </div>
-        <Button variant="secondary" size="sm" onClick={handlePrint} icon={<Printer size={14} />}>Print PDF</Button>
+        <Button variant="secondary" size="sm" onClick={handlePrint} icon={<Download size={14} />}>
+          Download PDF
+        </Button>
       </div>
     </div>
   )
@@ -101,10 +200,14 @@ export function StudentCertificates() {
       </div>
 
       {loading ? (
-        <div className="space-y-4">{[...Array(2)].map((_, i) => <div key={i} className="h-64 glass rounded-2xl animate-pulse" />)}</div>
+        <div className="space-y-4">
+          {[...Array(2)].map((_, i) => <div key={i} className="h-80 glass rounded-2xl animate-pulse" />)}
+        </div>
       ) : certs.length > 0 ? (
-        <div className="space-y-6">
-          {certs.map((cert) => <CertificateView key={cert.id} cert={cert} profile={{ name: profile?.name ?? 'Student' }} />)}
+        <div className="space-y-8">
+          {certs.map((cert) => (
+            <CertificateView key={cert.id} cert={cert} studentName={profile?.name ?? 'Student'} />
+          ))}
         </div>
       ) : (
         <div className="text-center py-24 glass rounded-2xl border border-gray-200 dark:border-white/8">

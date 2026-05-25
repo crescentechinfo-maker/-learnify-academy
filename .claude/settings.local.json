@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"/c/Users/shamalan/E LEARNING PLATFORM\" && cat node_modules/tailwindcss/package.json | grep '\"version\"' | head -1)",
+      "Read(//c/c/Users/shamalan/E LEARNING PLATFORM/node_modules/tailwindcss/**)"
+    ]
+  }
+}
