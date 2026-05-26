@@ -118,7 +118,7 @@ export function LandingPage() {
                   <span className="ml-2 text-xs text-gray-500">learnify-ai.app</span>
                 </div>
                 <div className="space-y-4">
-                  {['Web Development', 'Data Science', 'UI/UX Design', 'Machine Learning'].map((course, i) => (
+                  {['Prompt Engineering', 'Artificial Intelligence', 'Deep Learning', 'Machine Learning'].map((course, i) => (
                     <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/8">
                       <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-400 flex items-center justify-center">
                         <BookOpen size={16} className="text-white" />
