@@ -20,35 +20,47 @@ function starburstPoints(cx: number, cy: number, outerR: number, innerR: number,
 }
 
 function SealWithRibbon({ size = 130 }: { size?: number }) {
-  const pts = starburstPoints(60, 62, 46, 39)
+  const pts = starburstPoints(60, 60, 48, 41, 22)
+  const shadow = starburstPoints(60, 60, 48, 41, 22)
   return (
-    <svg width={size} height={size * 1.35} viewBox="0 0 120 175" xmlns="http://www.w3.org/2000/svg">
+    <svg width={size} height={size * 1.38} viewBox="0 0 120 178" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <radialGradient id="sg2" cx="38%" cy="32%" r="70%">
+        <radialGradient id="sg2" cx="36%" cy="28%" r="72%">
           <stop offset="0%" stopColor="#f87171" />
-          <stop offset="50%" stopColor="#dc2626" />
+          <stop offset="35%" stopColor="#dc2626" />
+          <stop offset="75%" stopColor="#b91c1c" />
           <stop offset="100%" stopColor="#7f1d1d" />
         </radialGradient>
-        <linearGradient id="rl" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#991b1b" /><stop offset="100%" stopColor="#dc2626" />
+        <linearGradient id="ribL" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#b91c1c" /><stop offset="50%" stopColor="#ef4444" /><stop offset="100%" stopColor="#991b1b" />
         </linearGradient>
-        <linearGradient id="rr" x1="100%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#991b1b" /><stop offset="100%" stopColor="#dc2626" />
+        <linearGradient id="ribR" x1="100%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#b91c1c" /><stop offset="50%" stopColor="#ef4444" /><stop offset="100%" stopColor="#991b1b" />
         </linearGradient>
       </defs>
-      <polygon points="28,100 58,100 48,168 28,164 38,148 22,160" fill="url(#rl)" />
-      <polygon points="28,100 35,100 28,130 22,130" fill="#7f1d1d" opacity="0.35" />
-      <polygon points="92,100 62,100 72,168 92,164 82,148 98,160" fill="url(#rr)" />
-      <polygon points="92,100 85,100 92,130 98,130" fill="#7f1d1d" opacity="0.35" />
-      <polygon points={pts} fill="#7f1d1d" transform="translate(1.5,2)" opacity="0.2" />
+
+      {/* Ribbon tails */}
+      <polygon points="26,102 54,102 46,170 26,166 37,150 20,164" fill="url(#ribL)" />
+      <rect x="36" y="102" width="2" height="58" fill="#7f1d1d" opacity="0.3" />
+      <polygon points="94,102 66,102 74,170 94,166 83,150 100,164" fill="url(#ribR)" />
+      <rect x="82" y="102" width="2" height="58" fill="#7f1d1d" opacity="0.3" />
+
+      {/* Drop shadow */}
+      <polygon points={shadow} fill="#5a0f0f" transform="translate(2,3)" opacity="0.18" />
+      {/* Starburst seal */}
       <polygon points={pts} fill="url(#sg2)" />
-      <circle cx="60" cy="62" r="31" fill="#dc2626" />
-      <circle cx="60" cy="62" r="28" fill="#b91c1c" />
-      <circle cx="60" cy="62" r="25" fill="none" stroke="#fca5a5" strokeWidth="0.7" strokeDasharray="2,1.5" />
-      <text x="60" y="52" textAnchor="middle" fill="#fff" fontSize="6" fontWeight="bold" fontFamily="Arial,sans-serif" letterSpacing="1.5">CERTIFIED</text>
-      <text x="60" y="63" textAnchor="middle" fill="#fff" fontSize="9.5" fontWeight="bold" fontFamily="Arial,sans-serif" letterSpacing="0.5">LEARNIFY</text>
-      <text x="60" y="73" textAnchor="middle" fill="#fca5a5" fontSize="6" fontFamily="Arial,sans-serif">✦ ✦ ✦</text>
-      <text x="60" y="83" textAnchor="middle" fill="#fff" fontSize="5.5" fontWeight="bold" fontFamily="Arial,sans-serif" letterSpacing="1">CERTIFIED</text>
+
+      {/* Inner circle */}
+      <circle cx="60" cy="60" r="32" fill="#c91a1a" />
+      <circle cx="60" cy="60" r="29" fill="#b91c1c" />
+      <circle cx="60" cy="60" r="26" fill="none" stroke="#fca5a5" strokeWidth="0.9" strokeDasharray="2.5,1.8" />
+      <circle cx="60" cy="60" r="23" fill="none" stroke="#f87171" strokeWidth="0.4" opacity="0.5" />
+
+      {/* Text */}
+      <text x="60" y="49" textAnchor="middle" fill="#fff" fontSize="6.5" fontWeight="bold" fontFamily="Arial,sans-serif" letterSpacing="2">CERTIFIED</text>
+      <text x="60" y="62" textAnchor="middle" fill="#fff" fontSize="10.5" fontWeight="bold" fontFamily="Arial Black,Arial,sans-serif" letterSpacing="0.8">LEARNIFY</text>
+      <text x="60" y="72" textAnchor="middle" fill="#fca5a5" fontSize="6" fontFamily="Arial,sans-serif">✦ ✦ ✦</text>
+      <text x="60" y="82" textAnchor="middle" fill="#fff" fontSize="6" fontWeight="bold" fontFamily="Arial,sans-serif" letterSpacing="1.5">CERTIFIED</text>
     </svg>
   )
 }
@@ -85,7 +97,7 @@ function CertificateView({ cert, studentName }: { cert: Certificate; studentName
 
   // Print fallback
   function handlePrint() {
-    const n = 36, cx = 60, cy = 62, outerR = 46, innerR = 39
+    const n = 22, cx = 60, cy = 60, outerR = 48, innerR = 41
     const pts: string[] = []
     for (let i = 0; i < n; i++) {
       const oa = ((i * 360 / n) - 90) * Math.PI / 180
@@ -94,7 +106,7 @@ function CertificateView({ cert, studentName }: { cert: Certificate; studentName
       pts.push(`${(cx + innerR * Math.cos(ia)).toFixed(2)},${(cy + innerR * Math.sin(ia)).toFixed(2)}`)
     }
     const p = pts.join(' ')
-    const sealSvg = `<svg width="130" height="175" viewBox="0 0 120 175" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="sg2" cx="38%" cy="32%" r="70%"><stop offset="0%" stop-color="#f87171"/><stop offset="50%" stop-color="#dc2626"/><stop offset="100%" stop-color="#7f1d1d"/></radialGradient><linearGradient id="rl" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#991b1b"/><stop offset="100%" stop-color="#dc2626"/></linearGradient><linearGradient id="rr" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#991b1b"/><stop offset="100%" stop-color="#dc2626"/></linearGradient></defs><polygon points="28,100 58,100 48,168 28,164 38,148 22,160" fill="url(#rl)"/><polygon points="28,100 35,100 28,130 22,130" fill="#7f1d1d" opacity="0.35"/><polygon points="92,100 62,100 72,168 92,164 82,148 98,160" fill="url(#rr)"/><polygon points="92,100 85,100 92,130 98,130" fill="#7f1d1d" opacity="0.35"/><polygon points="${p}" fill="#7f1d1d" transform="translate(1.5,2)" opacity="0.2"/><polygon points="${p}" fill="url(#sg2)"/><circle cx="60" cy="62" r="31" fill="#dc2626"/><circle cx="60" cy="62" r="28" fill="#b91c1c"/><circle cx="60" cy="62" r="25" fill="none" stroke="#fca5a5" stroke-width="0.7" stroke-dasharray="2,1.5"/><text x="60" y="52" text-anchor="middle" fill="#fff" font-size="6" font-weight="bold" font-family="Arial,sans-serif" letter-spacing="1.5">CERTIFIED</text><text x="60" y="63" text-anchor="middle" fill="#fff" font-size="9.5" font-weight="bold" font-family="Arial,sans-serif" letter-spacing="0.5">LEARNIFY</text><text x="60" y="73" text-anchor="middle" fill="#fca5a5" font-size="6" font-family="Arial,sans-serif">&#10022; &#10022; &#10022;</text><text x="60" y="83" text-anchor="middle" fill="#fff" font-size="5.5" font-weight="bold" font-family="Arial,sans-serif" letter-spacing="1">CERTIFIED</text></svg>`
+    const sealSvg = `<svg width="130" height="179" viewBox="0 0 120 178" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="sg2" cx="36%" cy="28%" r="72%"><stop offset="0%" stop-color="#f87171"/><stop offset="35%" stop-color="#dc2626"/><stop offset="75%" stop-color="#b91c1c"/><stop offset="100%" stop-color="#7f1d1d"/></radialGradient><linearGradient id="ribL" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#b91c1c"/><stop offset="50%" stop-color="#ef4444"/><stop offset="100%" stop-color="#991b1b"/></linearGradient><linearGradient id="ribR" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#b91c1c"/><stop offset="50%" stop-color="#ef4444"/><stop offset="100%" stop-color="#991b1b"/></linearGradient></defs><polygon points="26,102 54,102 46,170 26,166 37,150 20,164" fill="url(#ribL)"/><rect x="36" y="102" width="2" height="58" fill="#7f1d1d" opacity="0.3"/><polygon points="94,102 66,102 74,170 94,166 83,150 100,164" fill="url(#ribR)"/><rect x="82" y="102" width="2" height="58" fill="#7f1d1d" opacity="0.3"/><polygon points="${p}" fill="#5a0f0f" transform="translate(2,3)" opacity="0.18"/><polygon points="${p}" fill="url(#sg2)"/><circle cx="60" cy="60" r="32" fill="#c91a1a"/><circle cx="60" cy="60" r="29" fill="#b91c1c"/><circle cx="60" cy="60" r="26" fill="none" stroke="#fca5a5" stroke-width="0.9" stroke-dasharray="2.5,1.8"/><circle cx="60" cy="60" r="23" fill="none" stroke="#f87171" stroke-width="0.4" opacity="0.5"/><text x="60" y="49" text-anchor="middle" fill="#fff" font-size="6.5" font-weight="bold" font-family="Arial,sans-serif" letter-spacing="2">CERTIFIED</text><text x="60" y="62" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="bold" font-family="Arial Black,Arial,sans-serif" letter-spacing="0.8">LEARNIFY</text><text x="60" y="72" text-anchor="middle" fill="#fca5a5" font-size="6" font-family="Arial,sans-serif">&#10022; &#10022; &#10022;</text><text x="60" y="82" text-anchor="middle" fill="#fff" font-size="6" font-weight="bold" font-family="Arial,sans-serif" letter-spacing="1.5">CERTIFIED</text></svg>`
 
     const win = window.open('', '', 'width=1050,height=760')
     if (!win) return
