@@ -45,22 +45,30 @@ export async function issueCertificate(userId: string, courseId: string): Promis
     courseData?.title ?? 'the course'
   )
 
-  const insertPayload: Record<string, unknown> = {
+  const basePayload = {
     user_id: userId,
     course_id: courseId,
     certificate_code: generateCertCode(),
     issued_at: new Date().toISOString(),
   }
-  if (ai_message) insertPayload.ai_message = ai_message
 
-  const { data, error } = await supabase
+  // Try with ai_message first, fall back without it if column doesn't exist yet
+  let result = await supabase
     .from('certificates')
-    .insert(insertPayload)
+    .insert({ ...basePayload, ...(ai_message ? { ai_message } : {}) })
     .select('*, course:courses(*), profile:profiles(*)')
     .single()
 
-  if (error) throw error
-  return data
+  if (result.error?.message?.includes('ai_message')) {
+    result = await supabase
+      .from('certificates')
+      .insert(basePayload)
+      .select('*, course:courses(*), profile:profiles(*)')
+      .single()
+  }
+
+  if (result.error) throw result.error
+  return result.data
 }
 
 export async function getAllCertificates(): Promise<Certificate[]> {
