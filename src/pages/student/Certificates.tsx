@@ -15,19 +15,19 @@ function WaxSeal({ size = 80 }: { size?: number }) {
     <svg width={size} height={size} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <radialGradient id="sealGrad" cx="38%" cy="32%" r="70%">
-          <stop offset="0%" stopColor="#fde68a" />
-          <stop offset="50%" stopColor="#f59e0b" />
-          <stop offset="100%" stopColor="#b45309" />
+          <stop offset="0%" stopColor="#fca5a5" />
+          <stop offset="50%" stopColor="#ef4444" />
+          <stop offset="100%" stopColor="#7f1d1d" />
         </radialGradient>
       </defs>
-      <polygon points={points} fill="#92400e" transform="translate(1.5,2)" opacity="0.25" />
+      <polygon points={points} fill="#7f1d1d" transform="translate(1.5,2)" opacity="0.25" />
       <polygon points={points} fill="url(#sealGrad)" />
-      <circle cx={cx} cy={cy} r={31} fill="#d97706" />
-      <circle cx={cx} cy={cy} r={28} fill="#b45309" />
-      <circle cx={cx} cy={cy} r={25} fill="none" stroke="#fcd34d" strokeWidth="0.7" strokeDasharray="2.2,1.4" />
-      <text x={cx} y={43} textAnchor="middle" fill="#fef3c7" fontSize="7" fontWeight="bold" fontFamily="Arial,sans-serif" letterSpacing="1">LEARNIFY</text>
-      <text x={cx} y={55} textAnchor="middle" fill="#fef3c7" fontSize="13">★</text>
-      <text x={cx} y={65} textAnchor="middle" fill="#fef3c7" fontSize="5.5" fontWeight="bold" fontFamily="Arial,sans-serif" letterSpacing="1.5">CERTIFIED</text>
+      <circle cx={cx} cy={cy} r={31} fill="#dc2626" />
+      <circle cx={cx} cy={cy} r={28} fill="#b91c1c" />
+      <circle cx={cx} cy={cy} r={25} fill="none" stroke="#fca5a5" strokeWidth="0.7" strokeDasharray="2.2,1.4" />
+      <text x={cx} y={43} textAnchor="middle" fill="#ffffff" fontSize="7" fontWeight="bold" fontFamily="Arial,sans-serif" letterSpacing="1">LEARNIFY</text>
+      <text x={cx} y={55} textAnchor="middle" fill="#ffffff" fontSize="13">★</text>
+      <text x={cx} y={65} textAnchor="middle" fill="#ffffff" fontSize="5.5" fontWeight="bold" fontFamily="Arial,sans-serif" letterSpacing="1.5">CERTIFIED</text>
     </svg>
   )
 }
@@ -113,7 +113,7 @@ function CertificateView({ cert, studentName }: { cert: Certificate; studentName
             pts.push(`${(cx+innerR*Math.cos(ia)).toFixed(2)},${(cy+innerR*Math.sin(ia)).toFixed(2)}`)
           }
           const p=pts.join(' ')
-          return `<svg width="80" height="80" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="sg" cx="38%" cy="32%" r="70%"><stop offset="0%" stop-color="#fde68a"/><stop offset="50%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#b45309"/></radialGradient></defs><polygon points="${p}" fill="#92400e" transform="translate(1.5,2)" opacity="0.25"/><polygon points="${p}" fill="url(#sg)"/><circle cx="50" cy="50" r="31" fill="#d97706"/><circle cx="50" cy="50" r="28" fill="#b45309"/><circle cx="50" cy="50" r="25" fill="none" stroke="#fcd34d" stroke-width="0.7" stroke-dasharray="2.2,1.4"/><text x="50" y="43" text-anchor="middle" fill="#fef3c7" font-size="7" font-weight="bold" font-family="Arial,sans-serif" letter-spacing="1">LEARNIFY</text><text x="50" y="55" text-anchor="middle" fill="#fef3c7" font-size="13">&#9733;</text><text x="50" y="65" text-anchor="middle" fill="#fef3c7" font-size="5.5" font-weight="bold" font-family="Arial,sans-serif" letter-spacing="1.5">CERTIFIED</text></svg>`
+          return `<svg width="80" height="80" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="sg" cx="38%" cy="32%" r="70%"><stop offset="0%" stop-color="#fca5a5"/><stop offset="50%" stop-color="#ef4444"/><stop offset="100%" stop-color="#7f1d1d"/></radialGradient></defs><polygon points="${p}" fill="#7f1d1d" transform="translate(1.5,2)" opacity="0.25"/><polygon points="${p}" fill="url(#sg)"/><circle cx="50" cy="50" r="31" fill="#dc2626"/><circle cx="50" cy="50" r="28" fill="#b91c1c"/><circle cx="50" cy="50" r="25" fill="none" stroke="#fca5a5" stroke-width="0.7" stroke-dasharray="2.2,1.4"/><text x="50" y="43" text-anchor="middle" fill="#fff" font-size="7" font-weight="bold" font-family="Arial,sans-serif" letter-spacing="1">LEARNIFY</text><text x="50" y="55" text-anchor="middle" fill="#fff" font-size="13">&#9733;</text><text x="50" y="65" text-anchor="middle" fill="#fff" font-size="5.5" font-weight="bold" font-family="Arial,sans-serif" letter-spacing="1.5">CERTIFIED</text></svg>`
         })()}</div>
         <div class="footer-item">
           <div class="footer-label">Certificate ID</div>
