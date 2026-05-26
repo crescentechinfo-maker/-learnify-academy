@@ -129,6 +129,7 @@ DROP POLICY IF EXISTS "Students can update their own progress" ON progress;
 DROP POLICY IF EXISTS "Admins can view all progress" ON progress;
 DROP POLICY IF EXISTS "Students can view their own certificates" ON certificates;
 DROP POLICY IF EXISTS "Students can insert their own certificates" ON certificates;
+DROP POLICY IF EXISTS "Students can update their own certificates" ON certificates;
 DROP POLICY IF EXISTS "Admins can view all certificates" ON certificates;
 
 -- PROFILES policies
@@ -194,6 +195,9 @@ CREATE POLICY "Students can view their own certificates"
 
 CREATE POLICY "Students can insert their own certificates"
   ON certificates FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Students can update their own certificates"
+  ON certificates FOR UPDATE USING (auth.uid() = user_id);
 
 CREATE POLICY "Admins can view all certificates"
   ON certificates FOR SELECT USING (is_admin());
