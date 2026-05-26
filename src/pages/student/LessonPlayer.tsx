@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { CheckCircle, Circle, ChevronLeft, ChevronRight, BookOpen, Award } from 'lucide-react'
+import { CheckCircle, Circle, ChevronLeft, ChevronRight, BookOpen, Award, Sparkles, GraduationCap } from 'lucide-react'
 import { getCourse, getLessons, extractYouTubeId } from '../../lib/courses'
 import { getProgress, markLessonComplete } from '../../lib/progress'
 import { issueCertificate } from '../../lib/certificates'
@@ -18,6 +18,7 @@ export function LessonPlayer() {
   const [progress, setProgress] = useState<Progress | null>(null)
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null)
   const [marking, setMarking] = useState(false)
+  const [generatingCert, setGeneratingCert] = useState(false)
   const [loading, setLoading] = useState(true)
   const [certIssued, setCertIssued] = useState(false)
 
@@ -33,14 +34,18 @@ export function LessonPlayer() {
   }, [courseId, user])
 
   async function handleMarkComplete() {
-    if (!user || !courseId || !activeLesson || !progress) return
+    if (!user || !courseId || !activeLesson) return
     setMarking(true)
     try {
       const updated = await markLessonComplete(user.id, courseId, activeLesson.id, lessons.length)
       setProgress(updated)
       if (updated.percentage === 100) {
+        setMarking(false)
+        setGeneratingCert(true)
         await issueCertificate(user.id, courseId)
+        setGeneratingCert(false)
         setCertIssued(true)
+        return
       }
       const currentIndex = lessons.findIndex((l) => l.id === activeLesson.id)
       if (currentIndex < lessons.length - 1) setActiveLesson(lessons[currentIndex + 1])
@@ -75,16 +80,44 @@ export function LessonPlayer() {
         </div>
       </div>
 
-      {certIssued && (
-        <div className="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-gradient-to-r dark:from-amber-500/20 dark:to-yellow-400/10 border border-amber-200 dark:border-amber-500/30 flex items-center gap-4">
-          <Award size={28} className="text-amber-500 flex-shrink-0" />
-          <div className="flex-1">
-            <p className="font-semibold text-gray-900 dark:text-white">Congratulations! Course Completed!</p>
-            <p className="text-sm text-amber-700 dark:text-amber-300">Your certificate has been issued.</p>
+      {/* AI Generating Certificate overlay */}
+      {generatingCert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-900 rounded-3xl p-10 max-w-sm w-full mx-4 text-center shadow-2xl border border-amber-200 dark:border-amber-500/30">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center mx-auto mb-5 animate-pulse">
+              <Sparkles size={28} className="text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Course Completed! 🎉</h3>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">AI is generating your personalized certificate...</p>
+            <div className="flex items-center justify-center gap-1.5">
+              {[0,1,2].map(i => (
+                <div key={i} className="w-2 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
+              ))}
+            </div>
           </div>
-          <Button onClick={() => navigate('/student-dashboard/certificates')} variant="gold" size="sm" icon={<Award size={15} />}>
-            View Certificate
-          </Button>
+        </div>
+      )}
+
+      {/* Certificate Issued popup */}
+      {certIssued && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setCertIssued(false)}>
+          <div className="bg-white dark:bg-gray-900 rounded-3xl p-10 max-w-md w-full mx-4 text-center shadow-2xl border border-amber-200 dark:border-amber-500/30" onClick={e => e.stopPropagation()}>
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center mx-auto mb-5 shadow-lg">
+              <GraduationCap size={36} className="text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Congratulations! 🎉</h3>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">You completed</p>
+            <p className="text-lg font-semibold text-indigo-600 dark:text-indigo-400 mb-4">{course?.title}</p>
+            <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl p-3 mb-6">
+              <p className="text-xs text-amber-700 dark:text-amber-400 font-medium flex items-center justify-center gap-1.5">
+                <Sparkles size={13} /> AI-generated certificate is ready!
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button variant="ghost" onClick={() => setCertIssued(false)} className="flex-1">Continue Learning</Button>
+              <Button variant="gold" onClick={() => navigate('/student-dashboard/certificates')} icon={<Award size={15} />} className="flex-1">View Certificate</Button>
+            </div>
+          </div>
         </div>
       )}
 
