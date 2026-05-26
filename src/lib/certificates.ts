@@ -81,24 +81,20 @@ export async function issueCertificate(userId: string, courseId: string): Promis
 }
 
 export async function getAllCertificates(): Promise<Certificate[]> {
-  // Try with profile join first (admin view)
-  const { data, error } = await supabase
-    .from('certificates')
-    .select('*, course:courses(*), profile:profiles(*)')
-    .order('issued_at', { ascending: false })
-
-  if (!error) return data || []
-
-  // Fallback: fetch without profile join, then enrich manually
-  console.error('getAllCertificates with profile join failed, trying fallback:', error)
-  const { data: fallback, error: fallbackError } = await supabase
+  const { data: certs, error } = await supabase
     .from('certificates')
     .select('*, course:courses(*)')
     .order('issued_at', { ascending: false })
 
-  if (fallbackError) {
-    console.error('getAllCertificates fallback error:', fallbackError)
-    return []
-  }
-  return fallback || []
+  if (error || !certs || certs.length === 0) return certs || []
+
+  // Fetch profiles separately to avoid RLS join issues
+  const userIds = [...new Set(certs.map((c) => c.user_id))]
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, name, email, avatar')
+    .in('id', userIds)
+
+  const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]))
+  return certs.map((cert) => ({ ...cert, profile: profileMap.get(cert.user_id) ?? null }))
 }
