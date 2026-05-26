@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Download, GraduationCap, Sparkles, RefreshCw, AlertCircle } from 'lucide-react'
+import { Award, Download, GraduationCap, Sparkles, RefreshCw, AlertCircle } from 'lucide-react'
 
 function WaxSeal({ size = 80 }: { size?: number }) {
   const n = 36, cx = 50, cy = 50, outerR = 47, innerR = 40
