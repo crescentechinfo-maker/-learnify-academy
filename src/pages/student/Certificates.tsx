@@ -74,22 +74,27 @@ function CertificateView({ cert, studentName }: { cert: Certificate; studentName
     if (!certRef.current) return
     setDownloading(true)
     try {
-      const html2canvas = (await import('html2canvas')).default
-      const jsPDF = (await import('jspdf')).default
+      const { toPng } = await import('html-to-image')
+      const { jsPDF } = await import('jspdf')
 
-      const canvas = await html2canvas(certRef.current, {
-        scale: 2,
-        useCORS: true,
+      const dataUrl = await toPng(certRef.current, {
+        pixelRatio: 2,
         backgroundColor: '#fffef5',
-        logging: false,
+        cacheBust: true,
       })
 
-      const imgData = canvas.toDataURL('image/jpeg', 0.95)
-      const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width / 2, canvas.height / 2] })
-      pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width / 2, canvas.height / 2)
+      const img = new Image()
+      img.src = dataUrl
+      await new Promise<void>((res) => { img.onload = () => res() })
+
+      const w = img.width / 2
+      const h = img.height / 2
+      const pdf = new jsPDF({ orientation: w > h ? 'landscape' : 'portrait', unit: 'px', format: [w, h] })
+      pdf.addImage(dataUrl, 'PNG', 0, 0, w, h)
       pdf.save(`Learnify-Certificate-${cert.certificate_code}.pdf`)
     } catch (e) {
       console.error('Download error:', e)
+      alert('Could not generate PDF. Please use the Print button instead.')
     } finally {
       setDownloading(false)
     }
