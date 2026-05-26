@@ -45,15 +45,17 @@ export async function issueCertificate(userId: string, courseId: string): Promis
     courseData?.title ?? 'the course'
   )
 
+  const insertPayload: Record<string, unknown> = {
+    user_id: userId,
+    course_id: courseId,
+    certificate_code: generateCertCode(),
+    issued_at: new Date().toISOString(),
+  }
+  if (ai_message) insertPayload.ai_message = ai_message
+
   const { data, error } = await supabase
     .from('certificates')
-    .insert({
-      user_id: userId,
-      course_id: courseId,
-      certificate_code: generateCertCode(),
-      ai_message: ai_message || null,
-      issued_at: new Date().toISOString(),
-    })
+    .insert(insertPayload)
     .select('*, course:courses(*), profile:profiles(*)')
     .single()
 

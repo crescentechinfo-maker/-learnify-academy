@@ -42,7 +42,11 @@ export function LessonPlayer() {
       if (updated.percentage === 100) {
         setMarking(false)
         setGeneratingCert(true)
-        await issueCertificate(user.id, courseId)
+        try {
+          await issueCertificate(user.id, courseId)
+        } catch (e) {
+          console.error('Certificate issue error:', e)
+        }
         setGeneratingCert(false)
         setCertIssued(true)
         return
