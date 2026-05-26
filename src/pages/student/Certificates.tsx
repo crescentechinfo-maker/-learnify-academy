@@ -1,5 +1,36 @@
 import { useEffect, useState } from 'react'
-import { Award, Download, GraduationCap, Sparkles, RefreshCw, AlertCircle } from 'lucide-react'
+import { Download, GraduationCap, Sparkles, RefreshCw, AlertCircle } from 'lucide-react'
+
+function WaxSeal({ size = 80 }: { size?: number }) {
+  const n = 36, cx = 50, cy = 50, outerR = 47, innerR = 40
+  const pts: string[] = []
+  for (let i = 0; i < n; i++) {
+    const oa = ((i * 360 / n) - 90) * Math.PI / 180
+    const ia = (((i + 0.5) * 360 / n) - 90) * Math.PI / 180
+    pts.push(`${(cx + outerR * Math.cos(oa)).toFixed(2)},${(cy + outerR * Math.sin(oa)).toFixed(2)}`)
+    pts.push(`${(cx + innerR * Math.cos(ia)).toFixed(2)},${(cy + innerR * Math.sin(ia)).toFixed(2)}`)
+  }
+  const points = pts.join(' ')
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="sealGrad" cx="38%" cy="32%" r="70%">
+          <stop offset="0%" stopColor="#fde68a" />
+          <stop offset="50%" stopColor="#f59e0b" />
+          <stop offset="100%" stopColor="#b45309" />
+        </radialGradient>
+      </defs>
+      <polygon points={points} fill="#92400e" transform="translate(1.5,2)" opacity="0.25" />
+      <polygon points={points} fill="url(#sealGrad)" />
+      <circle cx={cx} cy={cy} r={31} fill="#d97706" />
+      <circle cx={cx} cy={cy} r={28} fill="#b45309" />
+      <circle cx={cx} cy={cy} r={25} fill="none" stroke="#fcd34d" strokeWidth="0.7" strokeDasharray="2.2,1.4" />
+      <text x={cx} y={43} textAnchor="middle" fill="#fef3c7" fontSize="7" fontWeight="bold" fontFamily="Arial,sans-serif" letterSpacing="1">LEARNIFY</text>
+      <text x={cx} y={55} textAnchor="middle" fill="#fef3c7" fontSize="13">★</text>
+      <text x={cx} y={65} textAnchor="middle" fill="#fef3c7" fontSize="5.5" fontWeight="bold" fontFamily="Arial,sans-serif" letterSpacing="1.5">CERTIFIED</text>
+    </svg>
+  )
+}
 import { useAuth } from '../../contexts/AuthContext'
 import { getUserCertificates, issueCertificate } from '../../lib/certificates'
 import { getAllProgress } from '../../lib/progress'
@@ -48,8 +79,7 @@ function CertificateView({ cert, studentName }: { cert: Certificate; studentName
       .footer-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; margin-bottom: 4px; }
       .footer-value { font-size: 13px; color: #334155; font-weight: 500; }
       .footer-code { font-family: monospace; font-size: 13px; color: #f59e0b; font-weight: 600; }
-      .seal { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #eab308); display: flex; flex-direction: column; align-items: center; justify-content: center; border: 3px solid #fff; box-shadow: 0 0 0 2px #f59e0b; }
-      .seal-text { font-size: 8px; font-weight: 700; color: #1a1a1a; text-transform: uppercase; letter-spacing: 1px; }
+      .seal svg { width: 80px; height: 80px; }
     </style></head><body>
     <div class="page"><div class="cert">
       <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
@@ -73,11 +103,18 @@ function CertificateView({ cert, studentName }: { cert: Certificate; studentName
           <div class="footer-label">Date Issued</div>
           <div class="footer-value">${issued}</div>
         </div>
-        <div class="seal">
-          <div class="seal-text">Learnify</div>
-          <div style="font-size:18px">★</div>
-          <div class="seal-text">Certified</div>
-        </div>
+        <div class="seal">${(() => {
+          const n=36,cx=50,cy=50,outerR=47,innerR=40
+          const pts=[]
+          for(let i=0;i<n;i++){
+            const oa=((i*360/n)-90)*Math.PI/180
+            const ia=(((i+0.5)*360/n)-90)*Math.PI/180
+            pts.push(`${(cx+outerR*Math.cos(oa)).toFixed(2)},${(cy+outerR*Math.sin(oa)).toFixed(2)}`)
+            pts.push(`${(cx+innerR*Math.cos(ia)).toFixed(2)},${(cy+innerR*Math.sin(ia)).toFixed(2)}`)
+          }
+          const p=pts.join(' ')
+          return `<svg width="80" height="80" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="sg" cx="38%" cy="32%" r="70%"><stop offset="0%" stop-color="#fde68a"/><stop offset="50%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#b45309"/></radialGradient></defs><polygon points="${p}" fill="#92400e" transform="translate(1.5,2)" opacity="0.25"/><polygon points="${p}" fill="url(#sg)"/><circle cx="50" cy="50" r="31" fill="#d97706"/><circle cx="50" cy="50" r="28" fill="#b45309"/><circle cx="50" cy="50" r="25" fill="none" stroke="#fcd34d" stroke-width="0.7" stroke-dasharray="2.2,1.4"/><text x="50" y="43" text-anchor="middle" fill="#fef3c7" font-size="7" font-weight="bold" font-family="Arial,sans-serif" letter-spacing="1">LEARNIFY</text><text x="50" y="55" text-anchor="middle" fill="#fef3c7" font-size="13">&#9733;</text><text x="50" y="65" text-anchor="middle" fill="#fef3c7" font-size="5.5" font-weight="bold" font-family="Arial,sans-serif" letter-spacing="1.5">CERTIFIED</text></svg>`
+        })()}</div>
         <div class="footer-item">
           <div class="footer-label">Certificate ID</div>
           <div class="footer-code">${cert.certificate_code}</div>
@@ -143,9 +180,8 @@ function CertificateView({ cert, studentName }: { cert: Certificate; studentName
               <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">Date Issued</p>
               <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{issued}</p>
             </div>
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex flex-col items-center justify-center shadow-md flex-shrink-0">
-              <span className="text-white text-xs font-bold leading-none">★</span>
-              <span className="text-white text-xs font-bold leading-none mt-0.5">CERT</span>
+            <div className="flex-shrink-0 drop-shadow-lg">
+              <WaxSeal size={72} />
             </div>
             <div className="text-center">
               <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">Certificate ID</p>
