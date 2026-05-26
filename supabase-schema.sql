@@ -1,7 +1,10 @@
 -- =====================================================
 -- Learnify AI Academy — Supabase Database Schema
--- Run this in your Supabase SQL Editor
+-- Run this ENTIRE file in Supabase SQL Editor
 -- =====================================================
+
+-- Add ai_message column if it doesn't exist (safe to run multiple times)
+ALTER TABLE certificates ADD COLUMN IF NOT EXISTS ai_message TEXT;
 
 -- 1. PROFILES TABLE
 CREATE TABLE IF NOT EXISTS profiles (

@@ -81,14 +81,24 @@ export async function issueCertificate(userId: string, courseId: string): Promis
 }
 
 export async function getAllCertificates(): Promise<Certificate[]> {
+  // Try with profile join first (admin view)
   const { data, error } = await supabase
     .from('certificates')
     .select('*, course:courses(*), profile:profiles(*)')
     .order('issued_at', { ascending: false })
 
-  if (error) {
-    console.error('getAllCertificates error:', error)
+  if (!error) return data || []
+
+  // Fallback: fetch without profile join, then enrich manually
+  console.error('getAllCertificates with profile join failed, trying fallback:', error)
+  const { data: fallback, error: fallbackError } = await supabase
+    .from('certificates')
+    .select('*, course:courses(*)')
+    .order('issued_at', { ascending: false })
+
+  if (fallbackError) {
+    console.error('getAllCertificates fallback error:', fallbackError)
     return []
   }
-  return data || []
+  return fallback || []
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Award, Download, GraduationCap, Sparkles, RefreshCw } from 'lucide-react'
+import { Award, Download, GraduationCap, Sparkles, RefreshCw, AlertCircle } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { getUserCertificates, issueCertificate } from '../../lib/certificates'
 import { getAllProgress } from '../../lib/progress'
@@ -51,43 +51,39 @@ function CertificateView({ cert, studentName }: { cert: Certificate; studentName
       .seal { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #eab308); display: flex; flex-direction: column; align-items: center; justify-content: center; border: 3px solid #fff; box-shadow: 0 0 0 2px #f59e0b; }
       .seal-text { font-size: 8px; font-weight: 700; color: #1a1a1a; text-transform: uppercase; letter-spacing: 1px; }
     </style></head><body>
-    <div class="page">
-      <div class="cert">
-        <div class="corner corner-tl"></div>
-        <div class="corner corner-tr"></div>
-        <div class="corner corner-bl"></div>
-        <div class="corner corner-br"></div>
-        <div>
-          <div class="logo-wrap" style="justify-content:center">
-            <div class="logo-icon">🎓</div>
-            <div class="logo-text">Learnify <span>AI</span></div>
-          </div>
-          <div class="academy">Learnify AI Academy</div>
-          <div class="divider"></div>
-          <div class="heading">Certificate of Completion</div>
-          <div class="sub">This is to proudly certify that</div>
-          <div class="name">${studentName}</div>
-          <div class="completed">has successfully completed the course</div>
-          <div class="course">${cert.course?.title ?? 'Course'}</div>
-          ${cert.ai_message ? `<div class="ai-msg">"${cert.ai_message}"</div>` : ''}
+    <div class="page"><div class="cert">
+      <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+      <div class="corner corner-bl"></div><div class="corner corner-br"></div>
+      <div>
+        <div class="logo-wrap" style="justify-content:center">
+          <div class="logo-icon">🎓</div>
+          <div class="logo-text">Learnify <span>AI</span></div>
         </div>
-        <div class="footer">
-          <div class="footer-item">
-            <div class="footer-label">Date Issued</div>
-            <div class="footer-value">${issued}</div>
-          </div>
-          <div class="seal">
-            <div class="seal-text">Learnify</div>
-            <div style="font-size:18px">★</div>
-            <div class="seal-text">Certified</div>
-          </div>
-          <div class="footer-item">
-            <div class="footer-label">Certificate ID</div>
-            <div class="footer-code">${cert.certificate_code}</div>
-          </div>
+        <div class="academy">Learnify AI Academy</div>
+        <div class="divider"></div>
+        <div class="heading">Certificate of Completion</div>
+        <div class="sub">This is to proudly certify that</div>
+        <div class="name">${studentName}</div>
+        <div class="completed">has successfully completed the course</div>
+        <div class="course">${cert.course?.title ?? 'Course'}</div>
+        ${cert.ai_message ? `<div class="ai-msg">"${cert.ai_message}"</div>` : ''}
+      </div>
+      <div class="footer">
+        <div class="footer-item">
+          <div class="footer-label">Date Issued</div>
+          <div class="footer-value">${issued}</div>
+        </div>
+        <div class="seal">
+          <div class="seal-text">Learnify</div>
+          <div style="font-size:18px">★</div>
+          <div class="seal-text">Certified</div>
+        </div>
+        <div class="footer-item">
+          <div class="footer-label">Certificate ID</div>
+          <div class="footer-code">${cert.certificate_code}</div>
         </div>
       </div>
-    </div>
+    </div></div>
     <script>window.onload=()=>{window.print();}</script>
     </body></html>`)
     win.document.close()
@@ -173,44 +169,54 @@ function CertificateView({ cert, studentName }: { cert: Certificate; studentName
 }
 
 export function StudentCertificates() {
-  const { profile, user } = useAuth()
+  const { profile } = useAuth()
   const [certs, setCerts] = useState<Certificate[]>([])
   const [completedNoCert, setCompletedNoCert] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [claiming, setClaiming] = useState<string | null>(null)
+  const [claimError, setClaimError] = useState<string | null>(null)
 
   async function loadData() {
-    if (!profile || !user) return
+    if (!profile) return
     setLoading(true)
-    try {
-      const [fetchedCerts, allProgress, allCourses] = await Promise.all([
-        getUserCertificates(profile.id),
-        getAllProgress(profile.id),
-        getCourses(),
-      ])
-      setCerts(fetchedCerts)
 
-      const certCourseIds = new Set(fetchedCerts.map((c) => c.course_id))
-      const completed100 = allProgress.filter((p) => p.percentage === 100).map((p) => p.course_id)
-      const missing = allCourses.filter((c) => completed100.includes(c.id) && !certCourseIds.has(c.id))
-      setCompletedNoCert(missing)
-    } finally {
-      setLoading(false)
-    }
+    // Fetch each independently so one failure doesn't block others
+    const fetchedCerts = await getUserCertificates(profile.id)
+    setCerts(fetchedCerts)
+
+    let allProgress: { course_id: string; percentage: number }[] = []
+    let allCourses: Course[] = []
+
+    try {
+      allProgress = await getAllProgress(profile.id)
+    } catch { /* no progress yet */ }
+
+    try {
+      allCourses = await getCourses()
+    } catch { /* no courses */ }
+
+    const certCourseIds = new Set(fetchedCerts.map((c) => c.course_id))
+    const completed100 = allProgress.filter((p) => p.percentage === 100).map((p) => p.course_id)
+    const missing = allCourses.filter((c) => completed100.includes(c.id) && !certCourseIds.has(c.id))
+    setCompletedNoCert(missing)
+
+    setLoading(false)
   }
 
   useEffect(() => {
-    loadData()
+    if (profile) loadData()
   }, [profile])
 
-  async function handleClaim(courseId: string) {
+  async function handleClaim(courseId: string, courseTitle: string) {
     if (!profile) return
+    setClaimError(null)
     setClaiming(courseId)
     try {
       await issueCertificate(profile.id, courseId)
       await loadData()
-    } catch (e) {
+    } catch (e: any) {
       console.error('Claim error:', e)
+      setClaimError(`Failed to claim certificate for "${courseTitle}". Please try again.`)
     } finally {
       setClaiming(null)
     }
@@ -223,13 +229,20 @@ export function StudentCertificates() {
         <p className="text-gray-500 dark:text-gray-400 mt-1">Your achievements and completed courses</p>
       </div>
 
+      {claimError && (
+        <div className="mb-6 flex items-center gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 text-sm">
+          <AlertCircle size={16} className="flex-shrink-0" />
+          {claimError}
+        </div>
+      )}
+
       {loading ? (
         <div className="space-y-4">
           {[...Array(2)].map((_, i) => <div key={i} className="h-80 glass rounded-2xl animate-pulse" />)}
         </div>
       ) : (
         <div className="space-y-8">
-          {/* Completed courses missing a cert — let student claim */}
+          {/* Completed courses missing a cert */}
           {completedNoCert.length > 0 && (
             <div className="glass rounded-2xl border border-amber-200 dark:border-amber-500/20 p-6">
               <div className="flex items-center gap-2 mb-4">
@@ -241,14 +254,14 @@ export function StudentCertificates() {
                   <div key={course.id} className="flex items-center justify-between p-4 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
                     <div>
                       <p className="font-medium text-gray-900 dark:text-white text-sm">{course.title}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">Course completed — certificate not yet generated</p>
+                      <p className="text-xs text-gray-500 mt-0.5">Course completed — click to generate your certificate</p>
                     </div>
                     <Button
                       size="sm"
                       variant="gold"
                       loading={claiming === course.id}
                       icon={<RefreshCw size={13} />}
-                      onClick={() => handleClaim(course.id)}
+                      onClick={() => handleClaim(course.id, course.title)}
                     >
                       Claim
                     </Button>
