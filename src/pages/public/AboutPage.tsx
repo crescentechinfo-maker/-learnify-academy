@@ -2,11 +2,6 @@ import { GraduationCap, Zap, Globe, Shield, Users, Award, BookOpen } from 'lucid
 import { Link } from 'react-router-dom'
 import { Button } from '../../components/ui/Button'
 
-const team = [
-  { name: 'Alex Rivera', role: 'CEO & Co-Founder', avatar: 'AR', bio: 'Former Google Engineer with 10+ years in EdTech' },
-  { name: 'Maya Johnson', role: 'Chief Learning Officer', avatar: 'MJ', bio: 'PhD in Educational Psychology, ex-Stanford faculty' },
-  { name: 'David Kim', role: 'CTO', avatar: 'DK', bio: 'Full-stack architect, open-source contributor' },
-]
 
 export function AboutPage() {
   return (
@@ -53,22 +48,6 @@ export function AboutPage() {
               <stat.icon size={24} className="text-indigo-500 mx-auto mb-2" />
               <div className="text-3xl font-bold gradient-text">{stat.value}</div>
               <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="mb-24">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white text-center mb-12">Meet Our Team</h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          {team.map((member) => (
-            <div key={member.name} className="glass rounded-2xl p-8 border border-gray-200 dark:border-white/8 text-center group hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-all duration-300">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-400 flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 group-hover:shadow-lg group-hover:shadow-indigo-500/30 transition-all duration-300">
-                {member.avatar}
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">{member.name}</h3>
-              <p className="text-indigo-600 dark:text-indigo-400 text-sm mt-1 mb-3">{member.role}</p>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">{member.bio}</p>
             </div>
           ))}
         </div>
