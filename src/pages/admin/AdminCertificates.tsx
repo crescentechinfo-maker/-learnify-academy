@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Award, Search, ChevronDown, ChevronUp, Trash2, Eye, X } from 'lucide-react'
+import { Award, Search, ChevronDown, ChevronUp, Trash2, Eye, X, AlertTriangle, Loader2 } from 'lucide-react'
 import { getAllCertificates, deleteCertificate } from '../../lib/certificates'
 import { CertificateView } from '../student/Certificates'
 import type { Certificate } from '../../types'
@@ -12,28 +12,38 @@ interface StudentGroup {
   certs: Certificate[]
 }
 
+interface DeleteTarget {
+  certId: string
+  courseTitle: string
+  studentName: string
+  certCode: string
+}
+
 export function AdminCertificates() {
   const [certs, setCerts] = useState<Certificate[]>([])
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
-  const [deleting, setDeleting] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null)
   const [viewCert, setViewCert] = useState<{ cert: Certificate; studentName: string } | null>(null)
 
   useEffect(() => {
     getAllCertificates().then((data) => { setCerts(data); setLoading(false) })
   }, [])
 
-  async function handleDelete(certId: string, courseTitle: string) {
-    if (!window.confirm(`Delete certificate for "${courseTitle}"? This cannot be undone.`)) return
-    setDeleting(certId)
+  async function confirmDelete() {
+    if (!deleteTarget) return
+    setDeleting(true)
     try {
-      await deleteCertificate(certId)
-      setCerts((prev) => prev.filter((c) => c.id !== certId))
+      await deleteCertificate(deleteTarget.certId)
+      setCerts((prev) => prev.filter((c) => c.id !== deleteTarget.certId))
+      setDeleteTarget(null)
     } catch {
+      setDeleteTarget(null)
       alert('Failed to delete certificate. Please try again.')
     } finally {
-      setDeleting(null)
+      setDeleting(false)
     }
   }
 
@@ -158,9 +168,16 @@ export function AdminCertificates() {
                           <Eye size={14} />
                         </button>
                         <button
-                          onClick={(e) => { e.stopPropagation(); handleDelete(cert.id, cert.course?.title ?? 'this course') }}
-                          disabled={deleting === cert.id}
-                          className="ml-1 p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors flex-shrink-0 disabled:opacity-40"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setDeleteTarget({
+                              certId: cert.id,
+                              courseTitle: cert.course?.title ?? 'Unknown Course',
+                              studentName: group.name,
+                              certCode: cert.certificate_code,
+                            })
+                          }}
+                          className="ml-1 p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors flex-shrink-0"
                           title="Delete certificate"
                         >
                           <Trash2 size={14} />
@@ -175,7 +192,74 @@ export function AdminCertificates() {
         </div>
       )}
 
-      {/* Certificate preview modal */}
+      {/* ── Delete confirmation modal ── */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+            {/* Red header bar */}
+            <div className="bg-red-500/10 border-b border-red-200 dark:border-red-500/20 px-6 py-5 flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                <AlertTriangle size={20} className="text-red-600 dark:text-red-400" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-gray-900 dark:text-white">Delete Certificate</h3>
+                <p className="text-sm text-red-600 dark:text-red-400 font-medium mt-0.5">This action cannot be undone</p>
+              </div>
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="ml-auto p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="px-6 py-5 space-y-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                You are about to permanently delete the following certificate:
+              </p>
+              <div className="rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 p-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-400 w-20 flex-shrink-0">Student</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">{deleteTarget.studentName}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-400 w-20 flex-shrink-0">Course</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">{deleteTarget.courseTitle}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-400 w-20 flex-shrink-0">Cert ID</span>
+                  <span className="text-xs font-mono text-amber-600 dark:text-amber-400">{deleteTarget.certCode}</span>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-500">
+                Once deleted, the student will lose access to this certificate and it cannot be recovered.
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="px-6 pb-5 flex items-center justify-end gap-3">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                disabled={deleting}
+                className="px-4 py-2 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-white/8 hover:bg-gray-200 dark:hover:bg-white/12 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={deleting}
+                className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 flex items-center gap-2"
+              >
+                {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                {deleting ? 'Deleting…' : 'Delete Certificate'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Certificate preview modal ── */}
       {viewCert && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
