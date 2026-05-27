@@ -120,7 +120,7 @@ function CornerOrnament({ flip }: { flip?: boolean }) {
 const GOLD = '#c9a84c'
 const CERT_W = 900
 
-function CertificateView({ cert, studentName }: { cert: Certificate; studentName: string }) {
+export function CertificateView({ cert, studentName }: { cert: Certificate; studentName: string }) {
   const certRef = useRef<HTMLDivElement>(null)
   const [downloading, setDownloading] = useState(false)
   const issued = new Date(cert.issued_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })

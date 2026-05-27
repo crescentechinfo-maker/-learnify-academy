@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Award, Search, ChevronDown, ChevronUp, Trash2 } from 'lucide-react'
+import { Award, Search, ChevronDown, ChevronUp, Trash2, Eye, X } from 'lucide-react'
 import { getAllCertificates, deleteCertificate } from '../../lib/certificates'
+import { CertificateView } from '../student/Certificates'
 import type { Certificate } from '../../types'
 
 interface StudentGroup {
@@ -17,6 +18,7 @@ export function AdminCertificates() {
   const [loading, setLoading] = useState(true)
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [viewCert, setViewCert] = useState<{ cert: Certificate; studentName: string } | null>(null)
 
   useEffect(() => {
     getAllCertificates().then((data) => { setCerts(data); setLoading(false) })
@@ -149,9 +151,16 @@ export function AdminCertificates() {
                           {new Date(cert.issued_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                         </p>
                         <button
+                          onClick={(e) => { e.stopPropagation(); setViewCert({ cert, studentName: group.name }) }}
+                          className="ml-2 p-1.5 rounded-lg text-gray-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors flex-shrink-0"
+                          title="View certificate"
+                        >
+                          <Eye size={14} />
+                        </button>
+                        <button
                           onClick={(e) => { e.stopPropagation(); handleDelete(cert.id, cert.course?.title ?? 'this course') }}
                           disabled={deleting === cert.id}
-                          className="ml-2 p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors flex-shrink-0 disabled:opacity-40"
+                          className="ml-1 p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors flex-shrink-0 disabled:opacity-40"
                           title="Delete certificate"
                         >
                           <Trash2 size={14} />
@@ -163,6 +172,24 @@ export function AdminCertificates() {
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* Certificate preview modal */}
+      {viewCert && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+          onClick={() => setViewCert(null)}
+        >
+          <div className="relative max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setViewCert(null)}
+              className="absolute -top-3 -right-3 z-10 w-8 h-8 rounded-full bg-gray-900 border border-white/20 flex items-center justify-center text-white hover:bg-gray-700 transition-colors"
+            >
+              <X size={14} />
+            </button>
+            <CertificateView cert={viewCert.cert} studentName={viewCert.studentName} />
+          </div>
         </div>
       )}
     </div>
