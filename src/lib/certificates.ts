@@ -80,6 +80,11 @@ export async function issueCertificate(userId: string, courseId: string): Promis
   return cert
 }
 
+export async function deleteCertificate(certId: string): Promise<void> {
+  const { error } = await supabase.from('certificates').delete().eq('id', certId)
+  if (error) throw error
+}
+
 export async function getAllCertificates(): Promise<Certificate[]> {
   const { data: certs, error } = await supabase
     .from('certificates')

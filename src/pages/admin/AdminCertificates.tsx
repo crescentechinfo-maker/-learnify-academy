@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Award, Search, ChevronDown, ChevronUp } from 'lucide-react'
-import { getAllCertificates } from '../../lib/certificates'
+import { Award, Search, ChevronDown, ChevronUp, Trash2 } from 'lucide-react'
+import { getAllCertificates, deleteCertificate } from '../../lib/certificates'
 import type { Certificate } from '../../types'
 
 interface StudentGroup {
@@ -16,10 +16,24 @@ export function AdminCertificates() {
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
+  const [deleting, setDeleting] = useState<string | null>(null)
 
   useEffect(() => {
     getAllCertificates().then((data) => { setCerts(data); setLoading(false) })
   }, [])
+
+  async function handleDelete(certId: string, courseTitle: string) {
+    if (!window.confirm(`Delete certificate for "${courseTitle}"? This cannot be undone.`)) return
+    setDeleting(certId)
+    try {
+      await deleteCertificate(certId)
+      setCerts((prev) => prev.filter((c) => c.id !== certId))
+    } catch {
+      alert('Failed to delete certificate. Please try again.')
+    } finally {
+      setDeleting(null)
+    }
+  }
 
   // Group certificates by student
   const groupMap = new Map<string, StudentGroup>()
@@ -134,6 +148,14 @@ export function AdminCertificates() {
                         <p className="text-xs text-gray-400 flex-shrink-0">
                           {new Date(cert.issued_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                         </p>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDelete(cert.id, cert.course?.title ?? 'this course') }}
+                          disabled={deleting === cert.id}
+                          className="ml-2 p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors flex-shrink-0 disabled:opacity-40"
+                          title="Delete certificate"
+                        >
+                          <Trash2 size={14} />
+                        </button>
                       </div>
                     ))}
                   </div>
