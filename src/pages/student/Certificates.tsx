@@ -19,38 +19,81 @@ function starburstPoints(cx: number, cy: number, outerR: number, innerR: number,
   return pts.join(' ')
 }
 
-function SealWithRibbon({ size = 120 }: { size?: number }) {
-  const pts = starburstPoints(60, 60, 48, 41, 22)
+function SealWithRibbon({ size = 140 }: { size?: number }) {
+  const mainPts = starburstPoints(60, 60, 50, 42, 24)
+  const outerPts = starburstPoints(60, 60, 56, 53, 40)
   return (
-    <svg width={size} height={size * 1.38} viewBox="0 0 120 178" xmlns="http://www.w3.org/2000/svg">
+    <svg width={size} height={size * 1.35} viewBox="0 0 120 178" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <radialGradient id="sg2" cx="36%" cy="28%" r="72%">
+        <radialGradient id="sealBody" cx="38%" cy="30%" r="72%">
           <stop offset="0%" stopColor="#f87171" />
-          <stop offset="35%" stopColor="#dc2626" />
-          <stop offset="75%" stopColor="#b91c1c" />
-          <stop offset="100%" stopColor="#7f1d1d" />
+          <stop offset="25%" stopColor="#dc2626" />
+          <stop offset="60%" stopColor="#b91c1c" />
+          <stop offset="100%" stopColor="#6b0f0f" />
+        </radialGradient>
+        <radialGradient id="innerDisc" cx="40%" cy="32%" r="68%">
+          <stop offset="0%" stopColor="#e53535" />
+          <stop offset="100%" stopColor="#991b1b" />
         </radialGradient>
         <linearGradient id="ribL" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#b91c1c" /><stop offset="50%" stopColor="#ef4444" /><stop offset="100%" stopColor="#991b1b" />
+          <stop offset="0%" stopColor="#9b1c1c" />
+          <stop offset="45%" stopColor="#ef4444" />
+          <stop offset="100%" stopColor="#7f1d1d" />
         </linearGradient>
         <linearGradient id="ribR" x1="100%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#b91c1c" /><stop offset="50%" stopColor="#ef4444" /><stop offset="100%" stopColor="#991b1b" />
+          <stop offset="0%" stopColor="#9b1c1c" />
+          <stop offset="45%" stopColor="#ef4444" />
+          <stop offset="100%" stopColor="#7f1d1d" />
         </linearGradient>
+        <linearGradient id="ribLShine" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
+          <stop offset="45%" stopColor="#ffffff" stopOpacity="0.18" />
+          <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+        </linearGradient>
+        <filter id="sealShadow" x="-10%" y="-10%" width="120%" height="130%">
+          <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#000" floodOpacity="0.28" />
+        </filter>
       </defs>
-      <polygon points="26,102 54,102 46,170 26,166 37,150 20,164" fill="url(#ribL)" />
-      <rect x="36" y="102" width="2" height="58" fill="#7f1d1d" opacity="0.3" />
-      <polygon points="94,102 66,102 74,170 94,166 83,150 100,164" fill="url(#ribR)" />
-      <rect x="82" y="102" width="2" height="58" fill="#7f1d1d" opacity="0.3" />
-      <polygon points={pts} fill="#5a0f0f" transform="translate(2,3)" opacity="0.18" />
-      <polygon points={pts} fill="url(#sg2)" />
-      <circle cx="60" cy="60" r="32" fill="#c91a1a" />
-      <circle cx="60" cy="60" r="29" fill="#b91c1c" />
-      <circle cx="60" cy="60" r="26" fill="none" stroke="#fca5a5" strokeWidth="0.9" strokeDasharray="2.5,1.8" />
-      <circle cx="60" cy="60" r="23" fill="none" stroke="#f87171" strokeWidth="0.4" opacity="0.5" />
-      <text x="60" y="49" textAnchor="middle" fill="#fff" fontSize="6.5" fontWeight="bold" fontFamily="Arial,sans-serif" letterSpacing="2">CERTIFIED</text>
-      <text x="60" y="62" textAnchor="middle" fill="#fff" fontSize="10.5" fontWeight="bold" fontFamily="Arial Black,Arial,sans-serif" letterSpacing="0.8">LEARNIFY</text>
-      <text x="60" y="72" textAnchor="middle" fill="#fca5a5" fontSize="6" fontFamily="Arial,sans-serif">✦ ✦ ✦</text>
-      <text x="60" y="82" textAnchor="middle" fill="#fff" fontSize="6" fontWeight="bold" fontFamily="Arial,sans-serif" letterSpacing="1.5">CERTIFIED</text>
+
+      {/* Ribbons */}
+      <polygon points="27,106 53,106 45,172 25,168 36,152 19,166" fill="url(#ribL)" />
+      <polygon points="27,106 53,106 45,172 25,168 36,152 19,166" fill="url(#ribLShine)" />
+      <line x1="37" y1="106" x2="35" y2="165" stroke="#7f1d1d" strokeWidth="1.2" opacity="0.35" />
+      <polygon points="93,106 67,106 75,172 95,168 84,152 101,166" fill="url(#ribR)" />
+      <polygon points="93,106 67,106 75,172 95,168 84,152 101,166" fill="url(#ribLShine)" />
+      <line x1="83" y1="106" x2="85" y2="165" stroke="#7f1d1d" strokeWidth="1.2" opacity="0.35" />
+
+      {/* Drop shadow of main starburst */}
+      <polygon points={mainPts} fill="#3d0000" transform="translate(2,4)" opacity="0.2" />
+
+      {/* Outer gold sunburst ring */}
+      <polygon points={outerPts} fill="#c9a84c" opacity="0.9" />
+
+      {/* Main starburst body */}
+      <polygon points={mainPts} fill="url(#sealBody)" filter="url(#sealShadow)" />
+
+      {/* Gold border circle */}
+      <circle cx="60" cy="60" r="36" fill="none" stroke="#c9a84c" strokeWidth="2" />
+      <circle cx="60" cy="60" r="33.5" fill="none" stroke="#c9a84c" strokeWidth="0.5" opacity="0.5" />
+
+      {/* Inner disc */}
+      <circle cx="60" cy="60" r="32" fill="url(#innerDisc)" />
+
+      {/* Gold dashed ring */}
+      <circle cx="60" cy="60" r="29" fill="none" stroke="#fbbf24" strokeWidth="0.9" strokeDasharray="2.2,1.6" />
+      <circle cx="60" cy="60" r="26" fill="none" stroke="#fca5a5" strokeWidth="0.4" opacity="0.5" />
+
+      {/* CERTIFIED top */}
+      <text x="60" y="44" textAnchor="middle" fill="#fde68a" fontSize="5.5" fontWeight="bold" fontFamily="Arial,sans-serif" letterSpacing="2.8">CERTIFIED</text>
+
+      {/* LEARNIFY center */}
+      <text x="60" y="58" textAnchor="middle" fill="#ffffff" fontSize="11.5" fontWeight="bold" fontFamily="Arial Black,Arial,sans-serif" letterSpacing="0.5">LEARNIFY</text>
+
+      {/* Gold star row */}
+      <text x="60" y="67.5" textAnchor="middle" fill="#fbbf24" fontSize="6" fontFamily="Arial,sans-serif">★  ★  ★</text>
+
+      {/* ACADEMY bottom */}
+      <text x="60" y="77" textAnchor="middle" fill="#fde68a" fontSize="5" fontWeight="bold" fontFamily="Arial,sans-serif" letterSpacing="2.5">ACADEMY</text>
     </svg>
   )
 }
@@ -106,16 +149,19 @@ function CertificateView({ cert, studentName }: { cert: Certificate; studentName
   }
 
   function handlePrint() {
-    const n = 22, cx = 60, cy = 60, outerR = 48, innerR = 41
-    const pts: string[] = []
-    for (let i = 0; i < n; i++) {
-      const oa = ((i * 360 / n) - 90) * Math.PI / 180
-      const ia = (((i + 0.5) * 360 / n) - 90) * Math.PI / 180
-      pts.push(`${(cx + outerR * Math.cos(oa)).toFixed(2)},${(cy + outerR * Math.sin(oa)).toFixed(2)}`)
-      pts.push(`${(cx + innerR * Math.cos(ia)).toFixed(2)},${(cy + innerR * Math.sin(ia)).toFixed(2)}`)
+    const buildPts = (cx: number, cy: number, or_: number, ir: number, n: number) => {
+      const a: string[] = []
+      for (let i = 0; i < n; i++) {
+        const oa = ((i * 360 / n) - 90) * Math.PI / 180
+        const ia = (((i + 0.5) * 360 / n) - 90) * Math.PI / 180
+        a.push(`${(cx + or_ * Math.cos(oa)).toFixed(2)},${(cy + or_ * Math.sin(oa)).toFixed(2)}`)
+        a.push(`${(cx + ir * Math.cos(ia)).toFixed(2)},${(cy + ir * Math.sin(ia)).toFixed(2)}`)
+      }
+      return a.join(' ')
     }
-    const p = pts.join(' ')
-    const sealSvg = `<svg width="120" height="166" viewBox="0 0 120 178" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="sg2" cx="36%" cy="28%" r="72%"><stop offset="0%" stop-color="#f87171"/><stop offset="35%" stop-color="#dc2626"/><stop offset="75%" stop-color="#b91c1c"/><stop offset="100%" stop-color="#7f1d1d"/></radialGradient><linearGradient id="ribL" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#b91c1c"/><stop offset="50%" stop-color="#ef4444"/><stop offset="100%" stop-color="#991b1b"/></linearGradient><linearGradient id="ribR" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#b91c1c"/><stop offset="50%" stop-color="#ef4444"/><stop offset="100%" stop-color="#991b1b"/></linearGradient></defs><polygon points="26,102 54,102 46,170 26,166 37,150 20,164" fill="url(#ribL)"/><rect x="36" y="102" width="2" height="58" fill="#7f1d1d" opacity="0.3"/><polygon points="94,102 66,102 74,170 94,166 83,150 100,164" fill="url(#ribR)"/><rect x="82" y="102" width="2" height="58" fill="#7f1d1d" opacity="0.3"/><polygon points="${p}" fill="#5a0f0f" transform="translate(2,3)" opacity="0.18"/><polygon points="${p}" fill="url(#sg2)"/><circle cx="60" cy="60" r="32" fill="#c91a1a"/><circle cx="60" cy="60" r="29" fill="#b91c1c"/><circle cx="60" cy="60" r="26" fill="none" stroke="#fca5a5" stroke-width="0.9" stroke-dasharray="2.5,1.8"/><circle cx="60" cy="60" r="23" fill="none" stroke="#f87171" stroke-width="0.4" opacity="0.5"/><text x="60" y="49" text-anchor="middle" fill="#fff" font-size="6.5" font-weight="bold" font-family="Arial,sans-serif" letter-spacing="2">CERTIFIED</text><text x="60" y="62" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="bold" font-family="Arial Black,Arial,sans-serif" letter-spacing="0.8">LEARNIFY</text><text x="60" y="72" text-anchor="middle" fill="#fca5a5" font-size="6" font-family="Arial,sans-serif">&#10022; &#10022; &#10022;</text><text x="60" y="82" text-anchor="middle" fill="#fff" font-size="6" font-weight="bold" font-family="Arial,sans-serif" letter-spacing="1.5">CERTIFIED</text></svg>`
+    const mainP = buildPts(60, 60, 50, 42, 24)
+    const outerP = buildPts(60, 60, 56, 53, 40)
+    const sealSvg = `<svg width="140" height="189" viewBox="0 0 120 178" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="sealBody" cx="38%" cy="30%" r="72%"><stop offset="0%" stop-color="#f87171"/><stop offset="25%" stop-color="#dc2626"/><stop offset="60%" stop-color="#b91c1c"/><stop offset="100%" stop-color="#6b0f0f"/></radialGradient><radialGradient id="innerDisc" cx="40%" cy="32%" r="68%"><stop offset="0%" stop-color="#e53535"/><stop offset="100%" stop-color="#991b1b"/></radialGradient><linearGradient id="ribL" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#9b1c1c"/><stop offset="45%" stop-color="#ef4444"/><stop offset="100%" stop-color="#7f1d1d"/></linearGradient><linearGradient id="ribR" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#9b1c1c"/><stop offset="45%" stop-color="#ef4444"/><stop offset="100%" stop-color="#7f1d1d"/></linearGradient></defs><polygon points="27,106 53,106 45,172 25,168 36,152 19,166" fill="url(#ribL)"/><line x1="37" y1="106" x2="35" y2="165" stroke="#7f1d1d" stroke-width="1.2" opacity="0.35"/><polygon points="93,106 67,106 75,172 95,168 84,152 101,166" fill="url(#ribR)"/><line x1="83" y1="106" x2="85" y2="165" stroke="#7f1d1d" stroke-width="1.2" opacity="0.35"/><polygon points="${outerP}" fill="#c9a84c" opacity="0.9"/><polygon points="${mainP}" fill="#3d0000" transform="translate(2,4)" opacity="0.2"/><polygon points="${mainP}" fill="url(#sealBody)"/><circle cx="60" cy="60" r="36" fill="none" stroke="#c9a84c" stroke-width="2"/><circle cx="60" cy="60" r="33.5" fill="none" stroke="#c9a84c" stroke-width="0.5" opacity="0.5"/><circle cx="60" cy="60" r="32" fill="url(#innerDisc)"/><circle cx="60" cy="60" r="29" fill="none" stroke="#fbbf24" stroke-width="0.9" stroke-dasharray="2.2,1.6"/><circle cx="60" cy="60" r="26" fill="none" stroke="#fca5a5" stroke-width="0.4" opacity="0.5"/><text x="60" y="44" text-anchor="middle" fill="#fde68a" font-size="5.5" font-weight="bold" font-family="Arial,sans-serif" letter-spacing="2.8">CERTIFIED</text><text x="60" y="58" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="bold" font-family="Arial Black,Arial,sans-serif" letter-spacing="0.5">LEARNIFY</text><text x="60" y="67.5" text-anchor="middle" fill="#fbbf24" font-size="6" font-family="Arial,sans-serif">&#9733; &#9733; &#9733;</text><text x="60" y="77" text-anchor="middle" fill="#fde68a" font-size="5" font-weight="bold" font-family="Arial,sans-serif" letter-spacing="2.5">ACADEMY</text></svg>`
 
     const win = window.open('', '', 'width=1050,height=800')
     if (!win) return
