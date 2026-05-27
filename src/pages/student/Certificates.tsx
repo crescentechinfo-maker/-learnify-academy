@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Award, Download, Sparkles, RefreshCw, AlertCircle, Loader2 } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { getUserCertificates, issueCertificate } from '../../lib/certificates'
@@ -106,7 +106,6 @@ function CertificateView({ cert, studentName }: { cert: Certificate; studentName
   }
 
   function handlePrint() {
-    const origin = window.location.origin
     const n = 22, cx = 60, cy = 60, outerR = 48, innerR = 41
     const pts: string[] = []
     for (let i = 0; i < n; i++) {
@@ -159,7 +158,7 @@ function CertificateView({ cert, studentName }: { cert: Certificate; studentName
       <div class="orn orn-l"><svg width="80" height="80" viewBox="0 0 88 88"><g opacity="1"><circle cx="18" cy="70" r="34" fill="none" stroke="#c9a84c" stroke-width="0.8"/><circle cx="18" cy="70" r="26" fill="none" stroke="#c9a84c" stroke-width="0.8"/><circle cx="18" cy="70" r="18" fill="none" stroke="#c9a84c" stroke-width="0.8"/><circle cx="18" cy="70" r="10" fill="none" stroke="#c9a84c" stroke-width="0.8"/><line x1="18" y1="36" x2="18" y2="88" stroke="#c9a84c" stroke-width="0.6"/><line x1="-16" y1="70" x2="52" y2="70" stroke="#c9a84c" stroke-width="0.6"/><line x1="-4" y1="46" x2="40" y2="88" stroke="#c9a84c" stroke-width="0.5"/><line x1="40" y1="46" x2="-4" y2="88" stroke="#c9a84c" stroke-width="0.5"/><polygon points="18,59 22,70 18,81 14,70" fill="#c9a84c" opacity="0.6"/><polygon points="6,70 18,66 30,70 18,74" fill="#c9a84c" opacity="0.6"/></g></svg></div>
       <div class="orn orn-r"><svg width="80" height="80" viewBox="0 0 88 88"><g opacity="1"><circle cx="18" cy="70" r="34" fill="none" stroke="#c9a84c" stroke-width="0.8"/><circle cx="18" cy="70" r="26" fill="none" stroke="#c9a84c" stroke-width="0.8"/><circle cx="18" cy="70" r="18" fill="none" stroke="#c9a84c" stroke-width="0.8"/><circle cx="18" cy="70" r="10" fill="none" stroke="#c9a84c" stroke-width="0.8"/><line x1="18" y1="36" x2="18" y2="88" stroke="#c9a84c" stroke-width="0.6"/><line x1="-16" y1="70" x2="52" y2="70" stroke="#c9a84c" stroke-width="0.6"/><line x1="-4" y1="46" x2="40" y2="88" stroke="#c9a84c" stroke-width="0.5"/><line x1="40" y1="46" x2="-4" y2="88" stroke="#c9a84c" stroke-width="0.5"/><polygon points="18,59 22,70 18,81 14,70" fill="#c9a84c" opacity="0.6"/><polygon points="6,70 18,66 30,70 18,74" fill="#c9a84c" opacity="0.6"/></g></svg></div>
       <div class="star"><svg width="20" height="20" viewBox="0 0 22 22"><polygon points="11,1 12.5,9.5 21,11 12.5,12.5 11,21 9.5,12.5 1,11 9.5,9.5" fill="#c9a84c"/></svg></div>
-      ${learnifyLogoHTMLString(200, 120, origin)}
+      ${learnifyLogoHTMLString(200, 80)}
       <div class="div"></div>
       <div class="title">Certificate of Completion</div>
       <div class="sub">This is to proudly certify that</div>
@@ -233,7 +232,7 @@ function CertificateView({ cert, studentName }: { cert: Certificate; studentName
 
         {/* Logo */}
         <div style={{ marginBottom: 4 }}>
-          <LearnifyLogoSVG width={200} height={120} />
+          <LearnifyLogoSVG width={200} height={80} />
         </div>
 
         {/* Gold divider */}
