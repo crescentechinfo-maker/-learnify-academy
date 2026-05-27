@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Award, Download, Sparkles, RefreshCw, AlertCircle, Loader2 } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { getUserCertificates, issueCertificate } from '../../lib/certificates'
